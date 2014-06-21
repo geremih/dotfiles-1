@@ -4,16 +4,17 @@
 [hub]
         protocol = https
 [user]
-        name = AUTHORNAME
-        email = AUTHOREMAIL
+        name = Mihir Rege
+        email = mihirrege@gmail.com
 [credential]
-        helper = GIT_CREDENTIAL_HELPER
+	helper = /usr/share/doc/git/contrib/credential/gnome-keyring/git-credential-gnome-keyring	
 [alias]
         co = checkout
         promote = !$ZSH/bin/git-promote
         wtf     = !$ZSH/bin/git-wtf
         rank-contributors = !$ZSH/bin/git-rank-contributors
-        count   = !git shortlog -sn
+	count   = !git shortlog -sn
+	cl = clone
 [color]
         diff = auto
         status = auto
@@ -21,7 +22,7 @@
         ui = true
 [core]
         excludesfile = ~/.gitignore
-        editor = vim
+        editor = emacs
 [apply]
         whitespace = nowarn
 [mergetool]
@@ -36,3 +37,6 @@
         #
         # Setting to git 2.0 default to surpress warning message
         default = simple
+[status]
+	branch = true
+	short = true
