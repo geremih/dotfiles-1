@@ -1,1 +1,2 @@
-export EDITOR='atom'
+export ALTERNATE_EDITOR=emacs
+export EDITOR=emacsclient
