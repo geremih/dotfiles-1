@@ -1,0 +1,482 @@
+
+;; .emacs --- Mihir's personal config file
+;;
+;;
+;; Author: Mihir Rege <mihirrege@gmail.com>
+
+;; This file is not part of GNU Emacs.
+
+;;; License:
+
+;; This program is free software; you can redistribute it and/or
+;; modify it under the terms of the GNU General Public License
+; as published by the Free Software Foundation; either version 3
+;; of the License, or (at your option) any later version.
+;;
+;; This program is distributed in the hope that it will be useful,
+;; but WITHOUT ANY WARRANTY; without even the implied warranty of
+;; MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+;; GNU General Public License for more details.
+;;
+;; You should have received a copy of the GNU General Public License
+;; along with GNU Emacs; see the file COPYING.  If not, write to the
+;; Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor,
+;; Boston, MA 02110-1301, USA.
+
+;;; Code:
+
+(server-start)
+;;;(add-to-list 'load-path "~/.emacs.d")
+(add-to-list 'load-path "~/.emacs.d/el-get/el-get")
+(add-to-list 'load-path "~/.emacs.d/slime/slime")
+(setq inferior-lisp-program "/usr/bin/clisp")
+(require 'slime-autoloads)
+(slime-setup)
+
+
+;;------------
+;;;Package Management
+;;-------------
+
+(require 'package)
+
+(setq package-archives '(("gnu" . "http://elpa.gnu.org/packages/")
+                         ("marmalade" . "http://marmalade-repo.org/packages/")
+                         ("melpa" . "http://melpa.milkbox.net/packages/")))
+
+;;----------------
+;;;Flymake
+;;----------------
+
+(eval-after-load "flymake"
+  '(progn
+    (defun flymake-after-change-function (start stop len)
+      "Start syntax check for current buffer if it isn't already running."
+      ;; Do nothing, don't want to run checks until I save.
+      )))
+
+;;Flymake custom make
+(defun flymake-create-simple-makefile ()
+  "Creates a simple check-syntax Makefile for simple C programs"
+  (interactive)
+  (if (file-exists-p "./Makefile")
+      (message "Makefile exists")
+    (with-temp-buffer
+      (message "Generating Makefile")
+      (insert "check-syntax:\n")
+      (insert "\tgcc -fsyntax-only -Wall -Wextra $(CHK_SOURCES)\n")
+      (write-region nil nil "./Makefile" nil 566)))
+  (flymake-mode 1))
+
+
+
+;;---------------------------
+;;;        Themes
+;;---------------------------
+(add-to-list 'custom-theme-load-path "~/.emacs.d/themes/")
+
+(load-theme 'zenburn t)
+;;(load-theme 'spolsky t)
+
+;; ----------------------
+;; General Customizations
+;; ----------------------
+(setq-default inhibit-splash-screen t
+	      inhibit-startup-message t
+	      font-lock-maximum-decoration t
+	      visible-bell t
+	      require-final-newline t
+	      resize-minibuffer-frame t
+	      column-number-mode t
+	      display-battery-mode t
+	      transient-mark-mode t
+	      next-line-add-newlines nil
+	      blink-matching-paren t
+	      quack-pretty-lambda-p t
+	      blink-matching-delay .25
+	      indent-tabs-mode nil
+	      tab-width 8
+	      c-basic-offset 8
+	      edebug-trace t
+	      fill-adapt-mode t
+	      winner-mode t
+	      uniquify-buffer-name-style 'forward
+	      save-place t
+	      delete-selection-mode t
+	      uniquify-buffer-name-style 'forward
+	      save-place t
+	      ido-everywhere t
+              ido-ubiquitious t
+	      x-select-enable-clipboard t
+	      x-select-enable-primary t
+	      save-interprogram-paste-before-kill t
+	      apropos-do-all t
+	      mouse-yank-at-point t
+	      save-place-file (concat user-emacs-directory "places")
+	      gdb-many-windows t )
+
+
+
+(put 'narrow-to-region 'disabled nil)
+(require 'auto-complete)
+
+(auto-complete)
+(global-auto-complete-mode t)
+(setq ac-ignore-case nil)
+(tool-bar-mode -1)
+(menu-bar-mode -1)
+(tooltip-mode -1)
+(eval-after-load "persp-mode" 
+  '(persp-mode t))
+
+(add-hook 'after-init-hook (lambda () (progn
+                                        (flx-ido-mode t)
+                                        )))
+
+;;projectile mode
+(eval-after-load "projectile-mode" 
+  '(progn
+     (projectile-global-mode t)
+     (setq projectile-enable-caching t)))
+(set-scroll-bar-mode 'nil)
+
+(add-hook 'haml-mode-hook
+          (lambda () (set (make-local-variable 'electric-indent-mode) nil)))
+(setq ido-use-faces nil)
+
+
+;;smex mode
+(global-set-key [(meta x)] (lambda ()
+                             (interactive)
+                             (or (boundp 'smex-cache)
+                                 (smex-initialize))
+                             (global-set-key [(meta x)] 'smex)
+                             (smex)))
+
+(global-set-key (kbd "C-c m") 'magit-status)
+
+(global-set-key [(shift meta x)] (lambda ()
+                                   (interactive)
+                                   (or (boundp 'smex-cache)
+                                       (smex-initialize))
+                                   (global-set-key [(shift meta x)] 'smex-major-mode-commands)
+                                   (smex-major-mode-commands)))
+
+;; General mode loading
+(show-paren-mode t)
+(savehist-mode t)
+(electric-indent-mode 1)
+(electric-pair-mode 1)
+(ido-mode 1)
+(add-hook 'after-init-hook 'my-after-init-hook)
+(defun my-after-init-hook ()
+  ;; do things after package initialization
+  (projectile-global-mode)
+  (setq projectile-completion-system 'ido)
+
+  )
+
+
+
+;;;Yes-no prompts
+(fset 'yes-or-no-p 'y-or-n-p)
+
+;;;Start maximized
+(custom-set-variables
+ ;; custom-set-variables was added by Custom.
+ ;; If you edit it by hand, you could mess it up, so be careful.
+ ;; Your init file should contain only one such instance.
+ ;; If there is more than one, they won't work right.
+ '(flycheck-clang-include-path
+   (quote
+    ( "/usr/local/include" "/usr/include" ".")))
+ '(initial-frame-alist (quote ((fullscreen . maximized)))))
+
+
+;;--------------------------
+;;    Custom Hooks
+;;--------------------------
+
+;;flycheck
+(add-hook 'after-init-hook #'global-flycheck-mode)
+
+;;Lisp
+(add-hook 'lisp-mode-hook #'enable-paredit-mode)
+(add-hook 'clojure-mode-hook 'paredit-mode)
+
+;;Paredit with Lisp modes
+(autoload 'enable-paredit-mode "paredit" "Turn on pseudo-structural editing of Lisp code." t)
+(add-hook 'emacs-lisp-mode-hook       #'enable-paredit-mode)
+(add-hook 'eval-expression-minibuffer-setup-hook #'enable-paredit-mode)
+(add-hook 'ielm-mode-hook             #'enable-paredit-mode)
+(add-hook 'lisp-mode-hook             #'enable-paredit-mode)
+(add-hook 'lisp-interaction-mode-hook #'enable-paredit-mode)
+(add-hook 'scheme-mode-hook           #'enable-paredit-mode)
+
+;;Celdoc Mode
+(add-hook 'c-mode-hook 'c-turn-on-eldoc-mode)
+(add-hook 'c++-mode-hook 'c-turn-on-eldoc-mode)
+
+;;Jslint flymake
+
+(add-hook 'flymake-mode-hook 'flymake-cursor-mode)
+;;jedi mode
+
+(add-hook 'python-mode-hook 'jedi:ac-setup)
+
+
+;;jade mode
+
+
+(defun jade-compile ()
+  (interactive)
+  (compile (concat "jade --pretty"
+                   " '" buffer-file-name "' '"
+                   (first (split-string buffer-file-name "[.]jade$"))
+                   ".html'")))
+
+(add-hook 'jade-mode-hook
+          (lambda ()
+            (add-hook 'after-save-hook 'jade-compile nil 'make-it-local)))
+
+
+;;-------------------------
+;;    Key-bindings
+;;------------------------
+
+(global-set-key (kbd "M-/") 'hippie-expand)
+(global-set-key (kbd "C-x C-b") 'ibuffer)
+(global-set-key (kbd "C-s") 'isearch-forward-regexp)
+(global-set-key (kbd "C-r") 'isearch-backward-regexp)
+(global-set-key (kbd "C-M-s") 'isearch-forward)
+(global-set-key (kbd "C-M-r") 'isearch-backward)
+(global-set-key (kbd "C-c C-SPC") 'ace-jump-mode)
+
+;; Unbind C-z. I don't want suspend
+(when window-system
+  (global-unset-key (kbd "C-z")) )
+
+;;Hack to differentiate C-i from <tab>
+                                        ;(keyboard-translate ?\C-i ?\H-i)
+                                        ;(global-set-key [?\H-i] 'back-to-indentation)
+
+
+
+;; ------------------------
+;; Useful utility functions
+;; ------------------------
+
+(defun bury-compile-buffer-if-successful (buffer string)
+  "Bury a compilation buffer if succeeded without warnings "
+  (if (and
+       (string-match "compilation" (buffer-name buffer))
+       (string-match "finished" string)
+       (not
+        (with-current-buffer buffer
+          (search-forward "warning" nil t))))
+      (run-with-timer 1 nil
+                      (lambda (buf)
+                        (bury-buffer buf)
+                        (switch-to-prev-buffer (get-buffer-window buf) 'kill))
+                      buffer)))
+(add-hook 'compilation-finish-functions 'bury-compile-buffer-if-successful)
+
+(defun rename-file-and-buffer ()
+  "Renames the current buffer and the file it's visiting"
+  (interactive)
+  (let ((name (buffer-name))
+	(filename (buffer-file-name)))
+    (if (not filename)
+	(message "Buffer '%s' is not visiting a file!" name)
+      (let ((new-name (read-file-name "New name: " filename)))
+        (if (get-buffer new-name)
+            (message "A buffer named '%s' already exists!" new-name)
+	  (progn (rename-file name new-name 1)
+		 (rename-buffer new-name)
+		 (set-visited-file-name new-name)
+		 (set-buffer-modified-p nil)))))))
+
+(defun generate-buffer ()
+  (interactive)
+  (switch-to-buffer (make-temp-name "scratch")))
+
+
+(defun delete-file-and-buffer ()
+  "Removes file connected to current buffer and kills buffer"
+  (interactive)
+  (let ((filename (buffer-file-name))
+        (buffer (current-buffer))
+        (name (buffer-name)))
+    (if (not (and filename (file-exists-p filename)))
+        (ido-kill-buffer)
+      (when (yes-or-no-p "Are you sure you want to remove this file? ")
+        (delete-file filename)
+        (kill-buffer buffer)
+        (message "File '%s' successfully removed" filename)))))
+
+
+(defun goto-line-with-feedback ()
+  "Show line numbers temporarily, while prompting for the line number input"
+  (interactive)
+  (unwind-protect
+      (progn
+        (linum-mode 1)
+        (goto-line (read-number "Goto line: ")))
+    (linum-mode -1)))
+
+(global-set-key [remap goto-line] 'goto-line-with-feedback)
+
+(defun copy-line-as-kill ()
+  (interactive)
+  (let (eol)
+    (save-excursion (end-of-line)
+		    (setq eol (point)))
+    (copy-region-as-kill (point) eol))
+
+  )
+
+(global-set-key "\M-k" 'copy-line-as-kill)
+
+
+(defun indent-entire-buffer ()
+  (interactive)
+  (save-excursion
+    (mark-whole-buffer)
+    (indent-region (point) (mark))))
+
+(global-set-key "\C-\M-\\" 'indent-entire-buffer)
+
+
+(defun kill-buffer-and-find-new ()
+  (interactive)
+  (let (( directory (file-name-directory (buffer-file-name))))
+    (kill-buffer (current-buffer))
+    (ido-find-file-in-dir directory)))
+
+(global-set-key (kbd "C-c C-f") 'kill-buffer-and-find-new )
+
+(defun insert-file-name (filename &optional args)
+  "Insert name of file FILENAME into buffer after point.
+  
+  Prefixed with \\[universal-argument], expand the file name to
+  its fully canocalized path.  See `expand-file-name'.
+  
+  Prefixed with \\[negative-argument], use relative path to file
+  name from current directory, `default-directory'.  See
+  `file-relative-name'.
+  
+  The default with no prefix is to insert the file name exactly as
+  it appears in the minibuffer prompt."
+
+  (interactive "*fInsert file name: \nP")
+  (cond ((eq '- args)
+         (insert (file-relative-name filename)))
+        ((not (null args))
+         (insert (expand-file-name filename)))
+        (t
+         (insert filename))))
+  
+
+
+
+;; ----------------------
+;;    Org mode setup
+;; ----------------------
+
+(setq org-mobile-directory "~/Dropbox/Apps/MobileOrg")
+(setq org-mobile-use-encryption "orgmode")
+(setq org-directory "~/org")
+
+(setq org-mobile-inbox-for-pull "~/org/mobile.org")
+(setq org-agenda-files '("~/org"))
+(setq org-agenda-custom-commands
+      '(("r" todo "REVIEW")))
+
+(global-set-key "\C-ca" 'org-agenda)
+
+
+
+(setq org-journal-dir "~/org/journal/")
+
+
+
+
+
+;; allow for export=>beamer by placing
+
+;; #+LaTeX_CLASS: beamer in org files
+(unless (boundp 'org-export-latex-classes)
+  (setq org-export-latex-classes nil))
+(add-to-list 'org-export-latex-classes
+             ;; beamer class, for presentations
+             '("beamer"
+               "\\documentclass[11pt]{beamer}\n
+      \\mode<{{{beamermode}}}>\n
+      \\usetheme{{{{beamertheme}}}}\n
+      \\usecolortheme{{{{beamercolortheme}}}}\n
+      \\beamertemplateballitem\n
+      \\setbeameroption{show notes}
+      \\usepackage[utf8]{inputenc}\n
+      \\usepackage[T1]{fontenc}\n
+      \\usepackage{hyperref}\n
+      \\usepackage{color}
+      \\usepackage{listings}
+      \\lstset{numbers=none,language=[ISO]C++,tabsize=4,
+  frame=single,
+  basicstyle=\\small,
+  showspaces=false,showstringspaces=false,
+  showtabs=false,
+  keywordstyle=\\color{blue}\\bfseries,
+  commentstyle=\\color{red},
+p  }\n
+      \\usepackage{verbatim}\n
+      \\institute{{{{beamerinstitute}}}}\n          
+       \\subject{{{{beamersubject}}}}\n"
+
+               ("\\section{%s}" . "\\section*{%s}")
+               
+               ("\\begin{frame}[fragile]\\frametitle{%s}"
+                "\\end{frame}"
+                "\\begin{frame}[fragile]\\frametitle{%s}"
+                "\\end{frame}")))
+
+;; letter class, for formal letters
+
+(add-to-list 'org-export-latex-classes
+
+             '("letter"
+               "\\documentclass[11pt]{letter}\n
+      \\usepackage[utf8]{inputenc}\n
+      \\usepackage[T1]{fontenc}\n
+      \\usepackage{color}"
+               
+               ("\\section{%s}" . "\\section*{%s}")
+               ("\\subsection{%s}" . "\\subsection*{%s}")
+               ("\\subsubsection{%s}" . "\\subsubsection*{%s}")
+               ("\\paragraph{%s}" . "\\paragraph*{%s}")
+               ("\\subparagraph{%s}" . "\\subparagraph*{%s}")))
+
+
+
+(defun open-as-sudo ()
+  (interactive)
+  (find-file (concat "/sudo::" (buffer-file-name))))
+
+
+(setq events '([mouse-1] [down-mouse-1] [drag-mouse-1] [double-mouse-1] [triple-mouse-1]  
+                     [mouse-2] [down-mouse-2] [drag-mouse-2] [double-mouse-2] [triple-mouse-2]
+                     [mouse-3] [down-mouse-3] [drag-mouse-3] [double-mouse-3] [triple-mouse-3]))
+(setq functions  (mapcar '(lambda (x)
+                            (lookup-key global-map x)) events))
+(defun disable-mouse ()
+  (interactive)
+  (dolist (k events)
+    (global-set-key k (lambda () (interactive) ))))
+
+(defun enable-mouse ()
+  (interactive)
+  (mapcar* '(lambda (x y)
+              (global-set-key x y)) events functions))
+(disable-mouse)
+(setq compilation-ask-about-save nil)
+
