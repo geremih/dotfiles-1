@@ -118,10 +118,11 @@
 
 
 (put 'narrow-to-region 'disabled nil)
-(require 'auto-complete)
 
+(eval-after-load "auto-complete"
+'(progn
 (auto-complete)
-(global-auto-complete-mode t)
+(global-auto-complete-mode t)))
 (setq ac-ignore-case nil)
 (tool-bar-mode -1)
 (menu-bar-mode -1)
