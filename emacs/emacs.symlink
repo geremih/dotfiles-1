@@ -26,12 +26,6 @@
 ;;; Code:
 
 (server-start)
-;;;(add-to-list 'load-path "~/.emacs.d")
-(add-to-list 'load-path "~/.emacs.d/el-get/el-get")
-(add-to-list 'load-path "~/.emacs.d/slime/slime")
-(setq inferior-lisp-program "/usr/bin/clisp")
-(require 'slime-autoloads)
-(slime-setup)
 
 
 ;;------------
@@ -43,40 +37,6 @@
 (setq package-archives '(("gnu" . "http://elpa.gnu.org/packages/")
                          ("marmalade" . "http://marmalade-repo.org/packages/")
                          ("melpa" . "http://melpa.milkbox.net/packages/")))
-
-;;----------------
-;;;Flymake
-;;----------------
-
-(eval-after-load "flymake"
-  '(progn
-    (defun flymake-after-change-function (start stop len)
-      "Start syntax check for current buffer if it isn't already running."
-      ;; Do nothing, don't want to run checks until I save.
-      )))
-
-;;Flymake custom make
-(defun flymake-create-simple-makefile ()
-  "Creates a simple check-syntax Makefile for simple C programs"
-  (interactive)
-  (if (file-exists-p "./Makefile")
-      (message "Makefile exists")
-    (with-temp-buffer
-      (message "Generating Makefile")
-      (insert "check-syntax:\n")
-      (insert "\tgcc -fsyntax-only -Wall -Wextra $(CHK_SOURCES)\n")
-      (write-region nil nil "./Makefile" nil 566)))
-  (flymake-mode 1))
-
-
-
-;;---------------------------
-;;;        Themes
-;;---------------------------
-(add-to-list 'custom-theme-load-path "~/.emacs.d/themes/")
-
-(load-theme 'zenburn t)
-;;(load-theme 'spolsky t)
 
 ;; ----------------------
 ;; General Customizations
@@ -134,6 +94,13 @@
                                         (flx-ido-mode t)
                                         )))
 
+;; Lisp setup
+(add-to-list 'load-path "~/.emacs.d/slime/slime")
+(setq inferior-lisp-program "/usr/bin/clisp")
+(require 'slime-autoloads)
+(slime-setup)
+
+
 ;;projectile mode
 (eval-after-load "projectile-mode" 
   '(progn
@@ -145,6 +112,41 @@
           (lambda () (set (make-local-variable 'electric-indent-mode) nil)))
 (setq ido-use-faces nil)
 
+
+
+;;----------------
+;;;Flymake
+;;----------------
+
+(eval-after-load "flymake"
+  '(progn
+    (defun flymake-after-change-function (start stop len)
+      "Start syntax check for current buffer if it isn't already running."
+      ;; Do nothing, don't want to run checks until I save.
+      )))
+
+;;Flymake custom make
+(defun flymake-create-simple-makefile ()
+  "Creates a simple check-syntax Makefile for simple C programs"
+  (interactive)
+  (if (file-exists-p "./Makefile")
+      (message "Makefile exists")
+    (with-temp-buffer
+      (message "Generating Makefile")
+      (insert "check-syntax:\n")
+      (insert "\tgcc -fsyntax-only -Wall -Wextra $(CHK_SOURCES)\n")
+      (write-region nil nil "./Makefile" nil 566)))
+  (flymake-mode 1))
+
+
+
+;;---------------------------
+;;;        Themes
+;;---------------------------
+(add-to-list 'custom-theme-load-path "~/.emacs.d/themes/")
+
+(load-theme 'zenburn t)
+;;(load-theme 'spolsky t)
 
 ;;smex mode
 (global-set-key [(meta x)] (lambda ()
