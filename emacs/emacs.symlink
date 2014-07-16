@@ -38,6 +38,15 @@
                          ("marmalade" . "http://marmalade-repo.org/packages/")
                          ("melpa" . "http://melpa.milkbox.net/packages/")))
 
+
+;;; Backups
+
+(setq backup-directory-alist `(("." . "~/.saves")))
+(setq backup-by-copying t)
+(setq delete-old-versions t
+  kept-new-versions 6
+  kept-old-versions 2
+  version-control t)
 ;; ----------------------
 ;; General Customizations
 ;; ----------------------
@@ -324,6 +333,7 @@
         (kill-buffer buffer)
         (message "File '%s' successfully removed" filename)))))
 
+(global-set-key (kbd "C-c C-k") 'delete-file-and-buffer)
 
 (defun goto-line-with-feedback ()
   "Show line numbers temporarily, while prompting for the line number input"
@@ -363,7 +373,7 @@
     (kill-buffer (current-buffer))
     (ido-find-file-in-dir directory)))
 
-(global-set-key (kbd "C-c C-f") 'kill-buffer-and-find-new )
+(global-set-key (kbd "C-c f") 'kill-buffer-and-find-new )
 
 (defun insert-file-name (filename &optional args)
   "Insert name of file FILENAME into buffer after point.
@@ -409,6 +419,9 @@
               (global-set-key x y)) events functions))
 (disable-mouse)
 (setq compilation-ask-about-save nil)
+
+(global-set-key [f6] 'revert-buffer)
+
 
 
 ;; ----------------------
