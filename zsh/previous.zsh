@@ -176,17 +176,18 @@ umask 002
 
 function set_proxy() {
     case $1 in
-        tor)
-	    unset http_proxy && unset https_proxy && \
-	    unset HTTP_PROXY && unset HTTPS_PROXY && export socks_proxy='127.0.0.1:9050'
-	    ;;
-	kgp|none)
-	    unset socks_proxy && export http_proxy='http://10.3.100.211:8080/' && \
-	    export https_proxy=$http_proxy;;
-	'home')
+	'kgp')
+	    unset STOP_AUTO_PROXY
+            reload-proxy
+            ;;
+        
+	'home'|'none')
+            export STOP_AUTO_PROXY="stop"
 	    unset socks_proxy
 	    unset http_proxy
 	    unset https_proxy
+            unset HTTP_PROXY
+	    unset HTTPS_PROXY
 	    ;;
 	*)
 	    unset socks_proxy && unset HTTP_PROXY && unset HTTPS_PROXY && \
@@ -194,31 +195,7 @@ function set_proxy() {
     esac
 }
 
-proxies=( \
-            "http://10.3.100.211:8080" \
-                "http://10.3.100.212:8080" \
-                "http://144.16.192.213:8080" \
-                "http://144.16.192.216:8080" \
-                "http://144.16.192.217:8080" \
-                "http://144.16.192.218:8080" \
-                "http://144.16.192.245:8080" \
-                "http://144.16.192.247:8080")
 
-# Use Microsoft servers to download large file
-large_file_url="http://download.microsoft.com/download/8/A/C/8AC7C482-BC74-492E-B978-7ED04900CEDE/IE10-Windows6.1-x86-en-us.exe"
-
-function speedtest_proxies() {
-    time=30
-    for proxy in $proxies;
-    do ;
-       curl --silent --max-time $time --proxy $proxy -o /dev/null \
-	    --write-out "$proxy --> %{speed_download} B/s\n" \
-	    $large_file_url >> ~/.speedtest_proxy &
-    done
-    wait && \
-    sort -k3 -n -r ~/.speedtest_proxy | awk 'NR==1{print $1}' \
-    && rm -f ~/.speedtest_proxy
-}
 
 function set_system_proxy(){
     proxy=$1
