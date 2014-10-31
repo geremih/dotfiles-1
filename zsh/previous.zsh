@@ -80,6 +80,7 @@ alias ga="git add"
 alias rm="rm -i"
 alias mv="mv -i"
 alias oldHome='cd /media/anakin/oldHome'
+alias xi='cd ~/codes/Xi_2.0'
 # tiny helpers
 function l () {
     case "$1" in
@@ -111,12 +112,7 @@ function x () {
     esac
 }
 
-function zshsource () {
 
-    if [[ -r ~/.aliasrc ]]; then
-        source ~/.zshrc
-    fi
-}
 
 # ---[ ZSH Options ]---------------------------------------------------
 setopt   NO_GLOBAL_RCS NO_FLOW_CONTROL NO_BEEP MULTIOS
