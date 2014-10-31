@@ -156,7 +156,7 @@ function precmd() { vcs_info }
 if [ $UID -eq 0 ]; then NCOLOR="red"; else NCOLOR="white"; fi
 
 PROMPT='%F{$NCOLOR}%B%n%b%f\
-${vcs_info_msg_0_}:\
+${vcs_info_msg_0_}${proxy_info_message_}\
 %F{yellow}%B%~%b%f%(!.#.$) '
 
 # ---[ System settings ]-----------------------------------------------
@@ -168,13 +168,25 @@ umask 002
 #--ruby
 
 #---Vikrant Proxy functions-----
+function reload-proxy(){
+    proxy_info_message_='%F{red}:%f'
+    if [[ -f ~/proxy.zsh ]]; then
+        if [[ -z "$STOP_AUTO_PROXY" ]]; then
+            source ~/proxy.zsh
+            proxy_info_message_=':'
+        fi
+    fi
+
+}
+
+add-zsh-hook preexec reload-proxy
+reload-proxy
 
 
 function set_proxy() {
     case $1 in
 	'kgp')
 	    unset STOP_AUTO_PROXY
-            reload-proxy
             ;;
         
 	'home'|'none')
@@ -186,9 +198,11 @@ function set_proxy() {
 	    unset HTTPS_PROXY
 	    ;;
 	*)
+            export STOP_AUTO_PROXY="stop"
 	    unset socks_proxy && unset HTTP_PROXY && unset HTTPS_PROXY && \
-	    export http_proxy=$1 && export https_proxy=$1;;
+	        export http_proxy=$1 && export https_proxy=$1;;
     esac
+    reload-proxy
 }
 
 
@@ -217,17 +231,6 @@ function set_system_proxy(){
     esac
 }
 
-function reload-proxy(){
-    if [[ -f ~/proxy.zsh ]]; then
-        if [[ -z "$STOP_AUTO_PROXY" ]]; then
-            source ~/proxy.zsh
-        fi
-    fi
-
-}
-
-add-zsh-hook preexec reload-proxy
-reload-proxy
 
 function notify(){
 }
