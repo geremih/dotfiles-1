@@ -35,6 +35,16 @@ function chpwd() {
     
 }
 
+function afp(){
+         node ~/codes/afp/main.js --proxyCommand "sh ~/codes/afp/proxy.zsh %h %p"
+
+}
+
+function sarl(){
+        /home/anakin/btp/eclipse-sarl.linux.gtk.x86_64.zip.1_FILES/eclipse-sarl
+
+}
+
 #--Custom
 function md(){
     mkdir -p "$1" && cd "$1";
@@ -50,6 +60,7 @@ zmodload -a zsh/stat stat
 zmodload -a zsh/zpty zpty
 zmodload -ap zsh/mapfile mapfile
 autoload colors zsh/terminfo
+autoload -U add-zsh-hook
 
 # ---[ Shell exports ]-------------------------------------------------
 export LANG=en_US.utf8
@@ -68,6 +79,7 @@ alias gco="git commit -m"
 alias ga="git add"
 alias rm="rm -i"
 alias mv="mv -i"
+alias oldHome='cd /media/anakin/oldHome'
 # tiny helpers
 function l () {
     case "$1" in
@@ -232,28 +244,31 @@ function set_system_proxy(){
     esac
 }
 
-function s(){
-    
-    
+function reload-proxy(){
+    if [[ -f ~/proxy.zsh ]]; then
+        if [[ -z "$STOP_AUTO_PROXY" ]]; then
+            source ~/proxy.zsh
+        fi
+    fi
+
 }
 
+add-zsh-hook preexec reload-proxy
+reload-proxy
 
+function notify(){
+}
+
+add-zsh-hook precmd  notify
 
 ### Added by the Heroku Toolbelt
-export PATH="/usr/local/heroku/bin:$PATH"
+export PATH=~/.local/share/npm/bin:/usr/local/heroku/bin:$PATH
 PATH=$HOME/.rvm/bin:$PATH # Add RVM to PATH for scripting
 source ~/.rvm/scripts/rvm
-eval "$(fasd --init auto)"
-
-
 
 function e(){
     $EDITOR $1&
-
 }
-
-
-
 
 #HADOOP VARIABLES START
 export JAVA_HOME=/usr/lib/jvm/java-7-openjdk-amd64
@@ -268,5 +283,3 @@ export HADOOP_COMMON_LIB_NATIVE_DIR=$HADOOP_INSTALL/lib/native
 export HADOOP_OPTS="-Djava.library.path=$HADOOP_INSTALL/lib"
 #HADOOP VARIABLES END
 
-#export HTTP_PROXY=http://144.16.192.217:8080
-#export HTTPS_PROXY=http://144.16.192.217:8080
