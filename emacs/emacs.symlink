@@ -237,6 +237,11 @@
 (add-hook 'c++-mode-hook 'c-turn-on-eldoc-mode)
 
 ;;Jslint flymake
+(defun jstidy ()
+  (interactive)
+  (let ((temp-point (point)))
+    (shell-command-on-region (point-min) (point-max) "js-beautify -f -" nil t)
+    (goto-char temp-point)))
 
 (add-hook 'flymake-mode-hook 'flymake-cursor-mode)
 ;;jedi mode
