@@ -284,6 +284,10 @@
             (add-hook 'after-save-hook 'jade-compile nil 'make-it-local)))
 
 
+(eval-after-load "powerline"
+            '(powerline-default-theme))
+
+
 ;;-------------------------
 ;;    Key-bindings
 ;;------------------------
