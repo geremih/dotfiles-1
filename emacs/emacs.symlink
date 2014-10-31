@@ -130,7 +130,7 @@
 (global-auto-complete-mode t)))
 (setq ac-ignore-case nil)
 
-(eval-after-load "persp-mode" 
+(eval-after-load "perspective" 
   '(persp-mode t))
 
 (add-hook 'after-init-hook (lambda () (progn
