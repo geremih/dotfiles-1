@@ -7,7 +7,7 @@
         name = Mihir Rege
         email = mihirrege@gmail.com
 [credential]
-	helper = /usr/share/doc/git/contrib/credential/gnome-keyring/git-credential-gnome-keyring	
+	helper = /usr/share/doc/git/contrib/credential/gnome-keyring/git-credential-gnome-keyring
 [alias]
         co = checkout
         promote = !$ZSH/bin/git-promote
@@ -40,3 +40,5 @@
 [status]
 	branch = true
 	short = true
+[url "https://github.com"]
+	insteadOf = git://github.com
