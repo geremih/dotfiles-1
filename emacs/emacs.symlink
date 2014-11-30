@@ -33,12 +33,13 @@
 ;;-------------
 
 (require 'package)
-
 (setq package-archives '(("gnu" . "http://elpa.gnu.org/packages/")
                          ("marmalade" . "http://marmalade-repo.org/packages/")
                          ("melpa" . "http://melpa.milkbox.net/packages/")))
 
-
+;;------------
+;; Auto Save
+;;------------
 
 (defvar emacs-autosave-directory
   (concat user-emacs-directory "autosaves/")
@@ -56,10 +57,11 @@
   kept-new-versions 6
   kept-old-versions 2
   version-control t)
-;(load-file "~/.emacs.d/diary.el")
+
 ;; ----------------------
 ;; General Customizations
 ;; ----------------------
+
 (setq-default inhibit-splash-screen t
 	      inhibit-startup-message t
 	      font-lock-maximum-decoration t
@@ -100,7 +102,7 @@
 (tooltip-mode -1)
 
 (put 'narrow-to-region 'disabled nil)
-
+(setq compilation-ask-about-save nil)
 
 ;; General mode loading
 (show-paren-mode t)
@@ -123,31 +125,19 @@
     ( "/usr/local/include" "/usr/include" ".")))
  '(initial-frame-alist (quote ((fullscreen . maximized)))))
 
-
-
 ;;---------------------------
 ;;;        Themes
 ;;---------------------------
 (add-to-list 'custom-theme-load-path "~/.emacs.d/themes/")
-
 (load-theme 'zenburn t)
-
-
-
-(eval-after-load "auto-complete"
-'(progn
-(auto-complete)
-(global-auto-complete-mode t)))
-(setq ac-ignore-case nil)
-
-(eval-after-load "perspective" 
-  '(persp-mode t))
 
 (add-hook 'after-init-hook (lambda () (progn
                                         (flx-ido-mode t)
                                         )))
 
-;; Lisp setup
+;;-----------------
+;; Setup
+;;-----------------
 (add-to-list 'load-path "~/.emacs.d/slime/slime")
 (setq inferior-lisp-program "/usr/bin/clisp")
 (require 'slime-autoloads)
@@ -161,21 +151,20 @@
      (setq projectile-enable-caching t)))
 (set-scroll-bar-mode 'nil)
 
+
+(eval-after-load "powerline"
+            '(powerline-default-theme))
+
 (add-hook 'after-init-hook 'my-after-init-hook)
 (defun my-after-init-hook ()
   ;; do things after package initialization
   (projectile-global-mode)
   (setq projectile-completion-system 'ido)
-
   )
-
-
 
 (add-hook 'haml-mode-hook
           (lambda () (set (make-local-variable 'electric-indent-mode) nil)))
 (setq ido-use-faces nil)
-
-
 
 ;;----------------
 ;;;Flymake
@@ -203,8 +192,9 @@
 
 
 
-
-;;smex mode
+;;--------
+;; Smex
+;;--------
 (global-set-key [(meta x)] (lambda ()
                              (interactive)
                              (or (boundp 'smex-cache)
@@ -212,7 +202,7 @@
                              (global-set-key [(meta x)] 'smex)
                              (smex)))
 
-(global-set-key (kbd "C-c m") 'magit-status)
+
 
 (global-set-key [(shift meta x)] (lambda ()
                                    (interactive)
@@ -245,32 +235,11 @@
 ;;Celdoc Mode
 (add-hook 'c-mode-hook 'c-turn-on-eldoc-mode)
 (add-hook 'c++-mode-hook 'c-turn-on-eldoc-mode)
-
-;;Jslint flymake
-(defun jstidy ()
-  (interactive)
-  (let ((temp-point (point)))
-    (shell-command-on-region (point-min) (point-max) "js-beautify -f -" nil t)
-    (goto-char temp-point)))
-
 (add-hook 'flymake-mode-hook 'flymake-cursor-mode)
-;;jedi mode
 
-(add-hook 'python-mode-hook 'jedi:ac-setup)
-(setq
- python-shell-interpreter "ipython"
- python-shell-interpreter-args ""
- python-shell-prompt-regexp "In \\[[0-9]+\\]: "
- python-shell-prompt-output-regexp "Out\\[[0-9]+\\]: "
- python-shell-completion-setup-code
-   "from IPython.core.completerlib import module_completion"
- python-shell-completion-module-string-code
-   "';'.join(module_completion('''%s'''))\n"
- python-shell-completion-string-code
-   "';'.join(get_ipython().Completer.all_completions('''%s'''))\n")
-
-;;jade mode
-
+;;--------------
+;; Jade
+;;--------------
 
 (defun jade-compile ()
   (interactive)
@@ -283,11 +252,6 @@
           (lambda ()
             (add-hook 'after-save-hook 'jade-compile nil 'make-it-local)))
 
-
-(eval-after-load "powerline"
-            '(powerline-default-theme))
-
-
 ;;-------------------------
 ;;    Key-bindings
 ;;------------------------
@@ -299,16 +263,10 @@
 (global-set-key (kbd "C-M-s") 'isearch-forward)
 (global-set-key (kbd "C-M-r") 'isearch-backward)
 (global-set-key (kbd "C-c C-SPC") 'ace-jump-mode)
-
+(global-set-key (kbd "C-c m") 'magit-status)
 ;; Unbind C-z. I don't want suspend
 (when window-system
   (global-unset-key (kbd "C-z")) )
-
-;;Hack to differentiate C-i from <tab>
-                                        ;(keyboard-translate ?\C-i ?\H-i)
-                                        ;(global-set-key [?\H-i] 'back-to-indentation)
-
-
 
 ;; ------------------------
 ;; Useful utility functions
@@ -426,116 +384,6 @@
          (insert filename))))
   
 
-
-(defun open-as-sudo ()
-  (interactive)
-  (find-file (concat "/sudo::" (buffer-file-name))))
-
-
-(setq events '([mouse-1] [down-mouse-1] [drag-mouse-1] [double-mouse-1] [triple-mouse-1]  
-                     [mouse-2] [down-mouse-2] [drag-mouse-2] [double-mouse-2] [triple-mouse-2]
-                     [mouse-3] [down-mouse-3] [drag-mouse-3] [double-mouse-3] [triple-mouse-3]))
-(setq functions  (mapcar '(lambda (x)
-                            (lookup-key global-map x)) events))
-(defun disable-mouse ()
-  (interactive)
-  (dolist (k events)
-    (global-set-key k (lambda () (interactive) ))))
-
-(defun enable-mouse ()
-  (interactive)
-  (mapcar* '(lambda (x y)
-              (global-set-key x y)) events functions))
-(disable-mouse)
-(setq compilation-ask-about-save nil)
-
-(global-set-key [f6] 'revert-buffer)
-
-
-
-;; ----------------------
-;;    Org mode setup
-;; ----------------------
-
-(setq org-mobile-directory "~/Dropbox/Apps/MobileOrg")
-(setq org-mobile-use-encryption "orgmode")
-(setq org-directory "~/org")
-
-(setq org-mobile-inbox-for-pull "~/org/mobile.org")
-(setq org-agenda-files '("~/org"))
-(setq org-agenda-custom-commands
-      '(("r" todo "REVIEW")))
-
-(global-set-key "\C-ca" 'org-agenda)
-
-
-
-(setq org-journal-dir "~/org/journal/")
-
-
-
-
-
-;; allow for export=>beamer by placing
-
-;; #+LaTeX_CLASS: beamer in org files
-(unless (boundp 'org-export-latex-classes)
-  (setq org-export-latex-classes nil))
-(add-to-list 'org-export-latex-classes
-             ;; beamer class, for presentations
-             '("beamer"
-               "\\documentclass[11pt]{beamer}\n
-      \\mode<{{{beamermode}}}>\n
-      \\usetheme{{{{beamertheme}}}}\n
-      \\usecolortheme{{{{beamercolortheme}}}}\n
-      \\beamertemplateballitem\n
-      \\setbeameroption{show notes}
-      \\usepackage[utf8]{inputenc}\n
-      \\usepackage[T1]{fontenc}\n
-      \\usepackage{hyperref}\n
-      \\usepackage{color}
-      \\usepackage{listings}
-      \\lstset{numbers=none,language=[ISO]C++,tabsize=4,
-  frame=single,
-  basicstyle=\\small,
-  showspaces=false,showstringspaces=false,
-  showtabs=false,
-  keywordstyle=\\color{blue}\\bfseries,
-  commentstyle=\\color{red},
-p  }\n
-      \\usepackage{verbatim}\n
-      \\institute{{{{beamerinstitute}}}}\n          
-       \\subject{{{{beamersubject}}}}\n"
-
-               ("\\section{%s}" . "\\section*{%s}")
-               
-               ("\\begin{frame}[fragile]\\frametitle{%s}"
-                "\\end{frame}"
-                "\\begin{frame}[fragile]\\frametitle{%s}"
-                "\\end{frame}")))
-
-;; letter class, for formal letters
-
-(add-to-list 'org-export-latex-classes
-
-             '("letter"
-               "\\documentclass[11pt]{letter}\n
-      \\usepackage[utf8]{inputenc}\n
-      \\usepackage[T1]{fontenc}\n
-      \\usepackage{color}"
-               
-               ("\\section{%s}" . "\\section*{%s}")
-               ("\\subsection{%s}" . "\\subsection*{%s}")
-               ("\\subsubsection{%s}" . "\\subsubsection*{%s}")
-               ("\\paragraph{%s}" . "\\paragraph*{%s}")
-               ("\\subparagraph{%s}" . "\\subparagraph*{%s}")))
-
-
-
-
-
-
-
 (defun delete-word (arg)
   "Delete characters forward until encountering the end of a word.
 With argument, do this that many times."
@@ -549,3 +397,41 @@ With argument, do this that many times."
   (delete-word (- arg)))
 
 (global-set-key (read-kbd-macro "<M-DEL>") 'backward-delete-word)
+
+(defun open-as-sudo ()
+  (interactive)
+  (find-file (concat "/sudo::" (buffer-file-name))))
+
+
+(setq events '([mouse-1] [down-mouse-1] [drag-mouse-1] [double-mouse-1] [triple-mouse-1]  
+                     [mouse-2] [down-mouse-2] [drag-mouse-2] [double-mouse-2] [triple-mouse-2]
+                     [mouse-3] [down-mouse-3] [drag-mouse-3] [double-mouse-3] [triple-mouse-3]))
+
+(setq functions  (mapcar '(lambda (x)
+                            (lookup-key global-map x)) events))
+(defun disable-mouse ()
+  (interactive)
+  (dolist (k events)
+    (global-set-key k (lambda () (interactive) ))))
+
+(defun enable-mouse ()
+  (interactive)
+  (mapcar* '(lambda (x y)
+              (global-set-key x y)) events functions))
+
+(disable-mouse)
+
+(global-set-key [f6] 'revert-buffer)
+
+(defun jstidy ()
+  (interactive)
+  (let ((temp-point (point)))
+    (shell-command-on-region (point-min) (point-max) "js-beautify -f -" nil t)
+    (goto-char temp-point)))
+
+;; ----------------------
+;;    Org mode 
+;; ----------------------
+
+(global-set-key "\C-ca" 'org-agenda)
+(setq org-journal-dir "~/org/journal/")
