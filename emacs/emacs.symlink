@@ -121,22 +121,8 @@
 
 ;;;Yes-no prompts
 (fset 'yes-or-no-p 'y-or-n-p)
-
-(setq langtool-language-tool-jar "~/languagetool-commandline.jar")
-
-;;;Start maximized
-(custom-set-variables
- ;; custom-set-variables was added by Custom.
- ;; If you edit it by hand, you could mess it up, so be careful.
- ;; Your init file should contain only one such instance.
- ;; If there is more than one, they won't work right.
- '(flycheck-clang-include-path (quote ("/usr/local/include" "/usr/include" ".")))
- '(initial-frame-alist (quote ((fullscreen . maximized))))
- '(network-security-level (quote low))
- '(package-selected-packages
-   (quote
-    (haskell-mode langtool helm zenburn-theme ximacs web-mode undo-tree smex pyvenv persp-projectile paredit nav markdown-mode key-chord journal jedi jade-mode inf-ruby highlight-indentation haml-mode geiser flycheck flx-ido edit-server debbugs company coffee-mode c-eldoc ace-jump-mode ac-cider)))
- '(xi-init-agents (quote ("InputManager" "music"))))
+(setq flycheck-clang-include-path (quote ("/usr/local/include" "/usr/include" ".")))
+(setq initial-frame-alist (quote ((fullscreen . maximized))))
 
 ;;---------------------------
 ;;;        Themes
