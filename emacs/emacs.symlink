@@ -220,21 +220,13 @@
      (global-set-key (kbd "C-x b") 'helm-mini)
      (global-set-key (kbd "C-x C-f") 'helm-find-files)
      (setq helm-buffers-fuzzy-matching t
-           helm-recentf-fuzzy-match    t))
-
-(add-hook 'cider-mode-hook #'eldoc-mode)
-
-
-
-
-
-
+           helm-recentf-fuzzy-match    t)))
   ;;--------------------------
   ;;    Custom Hooks
   ;;--------------------------
 
   ;;flycheck
-)
+(add-hook 'cider-mode-hook #'eldoc-mode)
 (add-hook 'after-init-hook #'global-flycheck-mode)
 
 ;;Lisp
