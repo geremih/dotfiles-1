@@ -1,10 +1,3 @@
-# ----[ HOME STUFF  ]--------
-unset http_proxy
-unset https_proxy
-unset ftp_proxy
-unset socks_proxy
-
-
 # ---[ History ]-------------------------------------------------------
 HISTSIZE=3000
 SAVEHIST=$HISTSIZE
@@ -29,6 +22,7 @@ function _z_preexec () {
 preexec_functions=(_z_preexec $preexec_functions)
 
 
+
 #---Autols
 function chpwd() {
     ls --color -v
@@ -49,6 +43,7 @@ function sarl(){
 function md(){
     mkdir -p "$1" && cd "$1";
 }
+
 
 
 # ---[ Modules ]-------------------------------------------------------
@@ -81,6 +76,8 @@ alias rm="rm -i"
 alias mv="mv -i"
 alias oldHome='cd /media/anakin/oldHome'
 alias xi='cd ~/codes/Xi_2.0'
+alias betty='~/codes/Xi_2.0/betty/main.rb'
+
 # tiny helpers
 function l () {
     case "$1" in
@@ -206,7 +203,7 @@ function set_proxy() {
 }
 
 
-
+set_proxy kgp
 function set_system_proxy(){
     proxy=$1
     #change_proxy proxy
@@ -239,13 +236,25 @@ add-zsh-hook precmd  notify
 
 ### Added by the Heroku Toolbelt
 export PATH=~/.local/share/npm/bin:/usr/local/heroku/bin:$PATH
-PATH=$HOME/.rvm/bin:$PATH # Add RVM to PATH for scripting
+export PATH=~/scripts:$PATH
+export PATH=$HOME/.rvm/bin:$PATH # Add RVM to PATH for scripting
+export PATH=$PATH:~/android/sdk/platform-tools
+# set PATH so it includes user's private bin if it exists
+if [ -d "$HOME/bin" ] ; then
+    PATH="$HOME/bin:$PATH"
+fi
 source ~/.rvm/scripts/rvm
+
+### ANTLR
+export CLASSPATH=".:/usr/local/lib/antlr-4.5-complete.jar:$CLASSPATH"
+alias antlr4='java -jar /usr/local/lib/antlr-4.5-complete.jar'
+alias grun='java org.antlr.v4.runtime.misc.TestRig'
 
 function e(){
     $EDITOR $1&
 }
 
+export no_proxy="10.*"
 #HADOOP VARIABLES START
 export JAVA_HOME=/usr/lib/jvm/java-7-openjdk-amd64
 export HADOOP_INSTALL=/usr/local/hadoop
