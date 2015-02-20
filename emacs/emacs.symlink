@@ -63,56 +63,49 @@
 ;; ----------------------
 
 (setq-default inhibit-splash-screen t
-	      inhibit-startup-message t
-	      font-lock-maximum-decoration t
-	      visible-bell t
-	      require-final-newline t
-	      resize-minibuffer-frame t
-	      column-number-mode t
-	      display-battery-mode t
-	      transient-mark-mode t
-	      next-line-add-newlines nil
-	      blink-matching-paren t
-	      quack-pretty-lambda-p t
-	      blink-matching-delay .25
-	      indent-tabs-mode nil
-	      tab-width 8
-	      c-basic-offset 8
-	      edebug-trace t
-	      fill-adapt-mode t
-	      winner-mode t
-	      uniquify-buffer-name-style 'forward
-	      save-place t
-	      delete-selection-mode t
-	      uniquify-buffer-name-style 'forward
-	      save-place t
-	      ido-everywhere t
-              ido-ubiquitious t
-	      x-select-enable-clipboard t
-	      x-select-enable-primary t
-	      save-interprogram-paste-before-kill t
-	      apropos-do-all t
-	      mouse-yank-at-point t
-	      save-place-file (concat user-emacs-directory "places")
-	      gdb-many-windows t )
+              inhibit-startup-message t
+              font-lock-maximum-decoration t
+              visible-bell t
+              require-final-newline t
+              resize-minibuffer-frame t
+              column-number-mode t
+              transient-mark-mode t
+              next-line-add-newlines nil
+              blink-matching-paren t
+              quack-pretty-lambda-p t
+              blink-matching-delay .25
+              indent-tabs-mode nil
+              tab-width 8
+              c-basic-offset 8
+              edebug-trace t
+              uniquify-buffer-name-style 'forward
+              uniquify-buffer-name-style 'forward
+              x-select-enable-clipboard t
+              x-select-enable-primary t
+              save-interprogram-paste-before-kill t
+              apropos-do-all t
+              mouse-yank-at-point t
+              gdb-many-windows t
+              compilation-ask-about-save nil)
 
 
+(winner-mode)
+(delete-selection-mode) 
+(tooltip-mode nil)
+(electric-pair-mode)
+(global-visual-line-mode)
+(savehist-mode)
+(show-paren-mode)
 (tool-bar-mode -1)
 (menu-bar-mode -1)
-(tooltip-mode -1)
-
-(put 'narrow-to-region 'disabled nil)
-(setq compilation-ask-about-save nil)
-
-;; General mode loading
-(show-paren-mode t)
-(savehist-mode t)
-(electric-indent-mode 1)
-(electric-pair-mode 1)
 (ido-mode 1)
+(ido-everywhere)
+(put 'narrow-to-region'disabled nil)
 
 ;;;Yes-no prompts
 (fset 'yes-or-no-p 'y-or-n-p)
+
+(setq langtool-language-tool-jar "~/languagetool-commandline.jar")
 
 ;;;Start maximized
 (custom-set-variables
@@ -120,14 +113,17 @@
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
- '(flycheck-clang-include-path
+ '(flycheck-clang-include-path (quote ("/usr/local/include" "/usr/include" ".")))
+ '(initial-frame-alist (quote ((fullscreen . maximized))))
+ '(network-security-level (quote low))
+ '(package-selected-packages
    (quote
-    ( "/usr/local/include" "/usr/include" ".")))
- '(initial-frame-alist (quote ((fullscreen . maximized)))))
+    (haskell-mode langtool helm zenburn-theme ximacs web-mode undo-tree smex pyvenv persp-projectile paredit nav markdown-mode key-chord journal jedi jade-mode inf-ruby highlight-indentation haml-mode geiser flycheck flx-ido edit-server debbugs company coffee-mode c-eldoc ace-jump-mode ac-cider)))
+ '(xi-init-agents (quote ("InputManager" "music"))))
 
 ;;---------------------------
 ;;;        Themes
-;;---------------------------
+ ;;---------------------------
 (add-to-list 'custom-theme-load-path "~/.emacs.d/themes/")
 (load-theme 'zenburn t)
 
@@ -145,7 +141,7 @@
 
 
 ;;projectile mode
-(eval-after-load "projectile-mode" 
+(eval-after-load "projectile-mode"
   '(progn
      (projectile-global-mode t)
      (setq projectile-enable-caching t)))
@@ -159,6 +155,7 @@
 (defun my-after-init-hook ()
   ;; do things after package initialization
   (projectile-global-mode)
+  (global-company-mode)
   (setq projectile-completion-system 'ido)
   )
 
@@ -195,28 +192,49 @@
 ;;--------
 ;; Smex
 ;;--------
-(global-set-key [(meta x)] (lambda ()
-                             (interactive)
-                             (or (boundp 'smex-cache)
-                                 (smex-initialize))
-                             (global-set-key [(meta x)] 'smex)
-                             (smex)))
+;
+;
+;; (global-set-key [(meta x)] (lambda ()
+;;                              (interactive)
+;;                              (or (boundp 'smex-cache)
+;;                                  (smex-initialize))
+;;                              (global-set-key [(meta x)] 'smex)
+;;                              (smex)))
 
 
 
-(global-set-key [(shift meta x)] (lambda ()
-                                   (interactive)
-                                   (or (boundp 'smex-cache)
-                                       (smex-initialize))
-                                   (global-set-key [(shift meta x)] 'smex-major-mode-commands)
-                                   (smex-major-mode-commands)))
+;; (global-set-key [(shift meta x)] (lambda ()
+;;                                    (interactive)
+;;                                    (or (boundp 'smex-cache)
+;;                                        (smex-initialize))
+;;                                    (global-set-key [(shift meta x)] 'smex-major-mode-commands)
+;;                                    (smex-major-mode-commands)))
 
 
-;;--------------------------
-;;    Custom Hooks
-;;--------------------------
 
-;;flycheck
+(eval-after-load "helm"
+  '(progn
+     (helm-mode 1)
+     (global-set-key (kbd "M-x") 'helm-M-x)
+     (global-set-key (kbd "M-y") 'helm-show-kill-ring)
+     (global-set-key (kbd "C-x b") 'helm-mini)
+     (global-set-key (kbd "C-x C-f") 'helm-find-files)
+     (setq helm-buffers-fuzzy-matching t
+           helm-recentf-fuzzy-match    t))
+
+(add-hook 'cider-mode-hook #'eldoc-mode)
+
+
+
+
+
+
+  ;;--------------------------
+  ;;    Custom Hooks
+  ;;--------------------------
+
+  ;;flycheck
+)
 (add-hook 'after-init-hook #'global-flycheck-mode)
 
 ;;Lisp
@@ -264,6 +282,11 @@
 (global-set-key (kbd "C-M-r") 'isearch-backward)
 (global-set-key (kbd "C-c C-SPC") 'ace-jump-mode)
 (global-set-key (kbd "C-c m") 'magit-status)
+(global-set-key (kbd "M-d") 'delete-backward-char)
+(global-set-key (kbd "C-c o") 'ido-find-file-other-window)
+(global-set-key (kbd "C-c r") 'ido-find-alternate-file)
+
+
 ;; Unbind C-z. I don't want suspend
 (when window-system
   (global-unset-key (kbd "C-z")) )
@@ -271,6 +294,7 @@
 ;; ------------------------
 ;; Useful utility functions
 ;; ------------------------
+
 
 (defun bury-compile-buffer-if-successful (buffer string)
   "Bury a compilation buffer if succeeded without warnings "
@@ -291,16 +315,16 @@
   "Renames the current buffer and the file it's visiting"
   (interactive)
   (let ((name (buffer-name))
-	(filename (buffer-file-name)))
+        (filename (buffer-file-name)))
     (if (not filename)
-	(message "Buffer '%s' is not visiting a file!" name)
+        (message "Buffer '%s' is not visiting a file!" name)
       (let ((new-name (read-file-name "New name: " filename)))
         (if (get-buffer new-name)
             (message "A buffer named '%s' already exists!" new-name)
-	  (progn (rename-file name new-name 1)
-		 (rename-buffer new-name)
-		 (set-visited-file-name new-name)
-		 (set-buffer-modified-p nil)))))))
+          (progn (rename-file name new-name 1)
+                 (rename-buffer new-name)
+                 (set-visited-file-name new-name)
+                 (set-buffer-modified-p nil)))))))
 
 (defun generate-buffer ()
   (interactive)
@@ -337,7 +361,7 @@
   (interactive)
   (let (eol)
     (save-excursion (end-of-line)
-		    (setq eol (point)))
+                    (setq eol (point)))
     (copy-region-as-kill (point) eol))
 
   )
@@ -347,9 +371,7 @@
 
 (defun indent-entire-buffer ()
   (interactive)
-  (save-excursion
-    (mark-whole-buffer)
-    (indent-region (point) (mark))))
+  (indent-region (point-min) (point-max)))
 
 (global-set-key "\C-\M-\\" 'indent-entire-buffer)
 
@@ -364,14 +386,14 @@
 
 (defun insert-file-name (filename &optional args)
   "Insert name of file FILENAME into buffer after point.
-  
+
   Prefixed with \\[universal-argument], expand the file name to
   its fully canocalized path.  See `expand-file-name'.
-  
+
   Prefixed with \\[negative-argument], use relative path to file
   name from current directory, `default-directory'.  See
   `file-relative-name'.
-  
+
   The default with no prefix is to insert the file name exactly as
   it appears in the minibuffer prompt."
 
@@ -382,7 +404,7 @@
          (insert (expand-file-name filename)))
         (t
          (insert filename))))
-  
+
 
 (defun delete-word (arg)
   "Delete characters forward until encountering the end of a word.
@@ -403,7 +425,7 @@ With argument, do this that many times."
   (find-file (concat "/sudo::" (buffer-file-name))))
 
 
-(setq events '([mouse-1] [down-mouse-1] [drag-mouse-1] [double-mouse-1] [triple-mouse-1]  
+(setq events '([mouse-1] [down-mouse-1] [drag-mouse-1] [double-mouse-1] [triple-mouse-1]
                      [mouse-2] [down-mouse-2] [drag-mouse-2] [double-mouse-2] [triple-mouse-2]
                      [mouse-3] [down-mouse-3] [drag-mouse-3] [double-mouse-3] [triple-mouse-3]))
 
@@ -429,9 +451,16 @@ With argument, do this that many times."
     (shell-command-on-region (point-min) (point-max) "js-beautify -f -" nil t)
     (goto-char temp-point)))
 
+(global-set-key (kbd "C-w") (lambda ()
+                              (interactive)
+                              (if (use-region-p)
+                                  (call-interactively #'kill-region)
+                                (call-interactively #'backward-kill-word))))
+
 ;; ----------------------
-;;    Org mode 
+;;    Org mode
 ;; ----------------------
 
 (global-set-key "\C-ca" 'org-agenda)
 (setq org-journal-dir "~/org/journal/")
+
