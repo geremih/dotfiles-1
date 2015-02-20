@@ -37,6 +37,23 @@
                          ("marmalade" . "http://marmalade-repo.org/packages/")
                          ("melpa" . "http://melpa.milkbox.net/packages/")))
 
+; list the packages you want
+(defvar package-list '(helm))
+
+(setq package-enable-at-startup nil)
+(package-initialize)
+
+; fetch the list of packages available 
+(unless package-archive-contents
+  (package-refresh-contents))
+
+; install the missing packages
+(dolist (package package-list)
+  (unless (package-installed-p package)
+    (package-install package)))
+
+(package-initialize)
+
 ;;------------
 ;; Auto Save
 ;;------------
@@ -212,15 +229,13 @@
 
 
 
-(eval-after-load "helm"
-  '(progn
-     (helm-mode 1)
-     (global-set-key (kbd "M-x") 'helm-M-x)
-     (global-set-key (kbd "M-y") 'helm-show-kill-ring)
-     (global-set-key (kbd "C-x b") 'helm-mini)
-     (global-set-key (kbd "C-x C-f") 'helm-find-files)
-     (setq helm-buffers-fuzzy-matching t
-           helm-recentf-fuzzy-match    t)))
+(helm-mode 1)
+(global-set-key (kbd "M-x") 'helm-M-x)
+(global-set-key (kbd "M-y") 'helm-show-kill-ring)
+(global-set-key (kbd "C-x b") 'helm-mini)
+(global-set-key (kbd "C-x C-f") 'helm-find-files)
+(setq helm-buffers-fuzzy-matching t
+      helm-recentf-fuzzy-match    t)
   ;;--------------------------
   ;;    Custom Hooks
   ;;--------------------------
@@ -267,7 +282,6 @@
 ;;------------------------
 
 (global-set-key (kbd "M-/") 'hippie-expand)
-(global-set-key (kbd "C-x C-b") 'ibuffer)
 (global-set-key (kbd "C-s") 'isearch-forward-regexp)
 (global-set-key (kbd "C-r") 'isearch-backward-regexp)
 (global-set-key (kbd "C-M-s") 'isearch-forward)
